@@ -1,8 +1,9 @@
-﻿ using MotoApp3.Repositories;
+ using MotoApp3.Repositories;
 using MotoApp3.Entities;
 using MotoApp3.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.VisualBasic;
 
 class Program
 {
@@ -12,10 +13,11 @@ class Program
 
         var carsRepository = new SqlRepository<Cars>(new MotoAppDbContext());
         var customerRepository = new SqlRepository<Customer>(new MotoAppDbContext());
-
+        DefaultCars(carsRepository);
         string input;
         do
         {
+            
             Console.WriteLine("\nCustomer View");
             Console.WriteLine("1. Show Customers");
             Console.WriteLine("2. Add Customers");
@@ -45,9 +47,26 @@ class Program
             }
         } while (input != "q");
     }
+    static void DefaultCars(IRepository<Cars> carsRepository)
+    {
+        var defaultCars = new[]
+        {
+            new Cars { Model = "Audi", Year = 2018, Country = "Germany"},
+            new Cars { Model = "Ford Focus", Year = 2009, Country = "Sweden"},
+            new Cars { Model = "Golf", Year = 2011, Country = "Italy"},
+            new Cars { Model = "Fiat", Year = 2012, Country = "Poland"}
+        };
+        foreach (var car in defaultCars)
+        {
+            carsRepository.Add(car);
+        }
+        carsRepository.Save();
 
+
+    }
     static void AddCars(IRepository<Cars> carsRepository)
     {
+        
         Console.Write("Enter Car Model: ");
         string model = Console.ReadLine();
         Console.Write("Enter Car Country: ");
@@ -106,95 +125,3 @@ class Program
     }
 }
 
-/*
-var carsRepository = new SqlRepository<Cars>(new MotoAppDbContext());
-var customerRepository = new SqlRepository<Customer>(new MotoAppDbContext());   
-AddCars(carsRepository);
-AddCustomers(customerRepository);
-WriteAllToConsole(carsRepository);
-string input;
-do
-{
-    Console.WriteLine("\nCustomer View");
-    Console.WriteLine("1. Show Customers");
-    Console.WriteLine("2. Add Customers");
-    Console.WriteLine("3. Show Cars");
-    Console.WriteLine("4. Add Cars");
-    Console.WriteLine("\n Press q to quit");
-
-    input = Console.ReadLine();
-    switch(input)
-    {
-        case "1":
-            WriteAllToConsole (customerRepository);
-            break;
-        case "2":
-            AddCustomers(customerRepository);
-            break;
-        case "3":
-            WriteAllToConsole(customerRepository);
-            break;
-        case "4":
-            AddCars(carsRepository);
-            break;
-        default:
-            Console.WriteLine("Wrong input, Try again");
-            break;
-    }
-} while (input != "q");
-static void AddCars(IRepository<Cars> carsRepository)
-{
-    Console.Write("Enter Car Model:");
-    string model = Console.ReadLine();
-    Console.WriteLine("Enter Car country:");
-    string country = Console.ReadLine();
-    Console.WriteLine("Enter Car Year");
-    if(!int.TryParse(Console.ReadLine(), out int year) || year < 0)
-    {
-        Console.WriteLine("Wrong Year, Put valid year again");
-        return;
-    }
-    
-
-    var newCar = new Cars 
-    { 
-        Model = model, 
-        Year = year, 
-        Country = country 
-    };
-    carsRepository.Add(newCar);
-    Console.WriteLine("Car Added");
-    carsRepository.Save();
-}
-static void AddCustomers(IRepository<Customer> customerRepository)
-{
-    Console.WriteLine("Enter:");
-    Console.Write("Customer Name:");
-    string name = Console.ReadLine();
-    Console.WriteLine("Last Name:");
-    string lastname = Console.ReadLine();
-
-    var newCustomer = new Customer { Name = name, Surname = lastname };
-    customerRepository.Add(newCustomer);
-    Console.WriteLine("Client Added");
-    customerRepository.Save();
-}
-static void WriteAllToConsole(IReadRepository<IEntity> repository)
-{
-    
-    var items = repository.GetAll();
-    if (items == null)
-    {
-        Console.WriteLine("No Customers");
-    }
-    else
-    {
-        foreach (var item in items)
-        {
-            Console.WriteLine(item);
-        }
-    }
-}
-
-
-*/
